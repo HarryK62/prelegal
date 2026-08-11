@@ -7,10 +7,10 @@ interface CoverPageFormProps {
   onChange: (values: CoverPageValues) => void;
 }
 
-const labelClass = "block text-sm font-medium text-zinc-700";
-const hintClass = "text-xs text-zinc-500";
+const labelClass = "block text-sm font-medium italic text-zinc-800";
+const hintClass = "text-xs text-zinc-600";
 const inputClass =
-  "mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 text-sm shadow-sm focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500";
+  "mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 text-sm text-zinc-900 shadow-sm focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500";
 const fieldsetClass = "space-y-4 border-t border-zinc-200 pt-6 first:border-t-0 first:pt-0";
 
 function PartyFields({
@@ -99,7 +99,7 @@ export default function CoverPageForm({ values, onChange }: CoverPageFormProps) 
             <input
               type="number"
               min={1}
-              className="w-16 rounded-md border border-zinc-300 px-2 py-1 text-sm"
+              className="w-16 rounded-md border border-zinc-300 px-2 py-1 text-sm text-zinc-900"
               value={values.mndaTermYears}
               onChange={(e) => set("mndaTermYears", Number(e.target.value))}
               disabled={values.mndaTermType !== "expires"}
@@ -134,7 +134,7 @@ export default function CoverPageForm({ values, onChange }: CoverPageFormProps) 
             <input
               type="number"
               min={1}
-              className="w-16 rounded-md border border-zinc-300 px-2 py-1 text-sm"
+              className="w-16 rounded-md border border-zinc-300 px-2 py-1 text-sm text-zinc-900"
               value={values.confidentialityTermYears}
               onChange={(e) => set("confidentialityTermYears", Number(e.target.value))}
               disabled={values.confidentialityTermType !== "years"}
