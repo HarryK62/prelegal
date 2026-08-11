@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Catalog of legal document templates sourced from Common Paper's CC BY 4.0 licensed agreements, stored in the templates/ directory.",
+  "source": "https://github.com/CommonPaper",
+  "license": "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)",
+  "templates": [
+    {
+      "name": "Mutual Non-Disclosure Agreement (Standard Terms)",
+      "description": "Standard terms for a mutual non-disclosure agreement (MNDA) that lets two parties disclose confidential information to each other while evaluating a potential business relationship.",
+      "filename": "Mutual-NDA.md"
+    },
+    {
+      "name": "Mutual Non-Disclosure Agreement (Cover Page)",
+      "description": "Cover page used with the Mutual NDA Standard Terms to capture the purpose, effective date, term, and governing law for a specific mutual non-disclosure agreement.",
+      "filename": "Mutual-NDA-coverpage.md"
+    },
+    {
+      "name": "Cloud Service Agreement",
+      "description": "Standard terms governing a customer's subscription to and use of a provider's cloud-hosted software product, covering access, support, payment, data privacy, warranties, liability, and confidentiality.",
+      "filename": "CSA.md"
+    },
+    {
+      "name": "Design Partner Agreement",
+      "description": "Agreement for early-access design partner programs, granting a partner early product access in exchange for feedback used to develop and improve the product.",
+      "filename": "Design-Partner-Agreement.md"
+    },
+    {
+      "name": "Service Level Agreement",
+      "description": "Standard terms defining uptime and support response time commitments, how they are calculated, and the service credits or termination rights available if they are not met.",
+      "filename": "SLA.md"
+    },
+    {
+      "name": "Professional Services Agreement",
+      "description": "Standard terms for engaging a provider to perform professional services under one or more statements of work, covering deliverables, intellectual property, payment, and warranties.",
+      "filename": "PSA.md"
+    },
+    {
+      "name": "Data Processing Agreement",
+      "description": "Standard terms governing the processing of personal data by a provider on behalf of a customer, including subprocessors, international data transfers, security incident response, and audit rights.",
+      "filename": "DPA.md"
+    },
+    {
+      "name": "Software License Agreement",
+      "description": "Standard terms for licensing on-premises or client-side software to a customer, covering the license grant, restrictions, updates, warranties, and liability.",
+      "filename": "Software-License-Agreement.md"
+    },
+    {
+      "name": "Partnership Agreement",
+      "description": "Standard terms for a business partnership between two companies, covering mutual obligations, trademark licensing, payment, and confidentiality.",
+      "filename": "Partnership-Agreement.md"
+    },
+    {
+      "name": "Pilot Agreement",
+      "description": "Standard terms for a time-limited pilot or trial of a product, allowing a customer to evaluate the product before entering into a longer-term definitive agreement.",
+      "filename": "Pilot-Agreement.md"
+    },
+    {
+      "name": "Business Associate Agreement",
+      "description": "Standard terms required under HIPAA for a business associate that creates, receives, maintains, or transmits protected health information (PHI) on behalf of a covered entity.",
+      "filename": "BAA.md"
+    },
+    {
+      "name": "AI Addendum",
+      "description": "Standard addendum supplementing a product agreement to govern the use of AI features, including input/output ownership, model training restrictions, and AI-specific disclaimers.",
+      "filename": "AI-Addendum.md"
+    }
+  ]
+}
