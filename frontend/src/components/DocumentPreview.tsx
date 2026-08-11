@@ -27,34 +27,34 @@ function ClauseText({ body, values }: { body: string; values: CoverPageValues })
 
 export default function DocumentPreview({ values }: { values: CoverPageValues }) {
   return (
-    <article className="prose prose-zinc max-w-none rounded-lg border border-zinc-200 bg-white p-8 text-sm leading-relaxed">
+    <article className="prose prose-zinc max-w-none rounded-lg border border-zinc-200 bg-white p-8 text-sm leading-relaxed text-zinc-900">
       <h1 className="text-xl font-semibold">Mutual Non-Disclosure Agreement</h1>
 
       <section className="space-y-4">
         <h2 className="text-base font-semibold">Cover Page</h2>
 
         <div>
-          <div className="text-xs font-medium uppercase text-zinc-500">Purpose</div>
+          <div className="text-xs font-medium uppercase text-zinc-600">Purpose</div>
           <p>{values.purpose || "[Purpose not yet specified]"}</p>
         </div>
 
         <div>
-          <div className="text-xs font-medium uppercase text-zinc-500">Effective Date</div>
+          <div className="text-xs font-medium uppercase text-zinc-600">Effective Date</div>
           <p>{formatDate(values.effectiveDate)}</p>
         </div>
 
         <div>
-          <div className="text-xs font-medium uppercase text-zinc-500">MNDA Term</div>
+          <div className="text-xs font-medium uppercase text-zinc-600">MNDA Term</div>
           <p>{formatMndaTerm(values)}</p>
         </div>
 
         <div>
-          <div className="text-xs font-medium uppercase text-zinc-500">Term of Confidentiality</div>
+          <div className="text-xs font-medium uppercase text-zinc-600">Term of Confidentiality</div>
           <p>{formatConfidentialityTerm(values)}</p>
         </div>
 
         <div>
-          <div className="text-xs font-medium uppercase text-zinc-500">Governing Law &amp; Jurisdiction</div>
+          <div className="text-xs font-medium uppercase text-zinc-600">Governing Law &amp; Jurisdiction</div>
           <p>
             Governing Law: {values.governingLaw || "[Fill in state]"}
             <br />
