@@ -16,7 +16,8 @@ When instructed to build a feature:
 1. Use your Atlassian tools to read the feature instructions from Jira
 2. Develop the feature - do not skip any step from the feature-dev 7 step process
 3. Thoroughly test the feature with unit tests and integration tests and fix any issues
-4. Submit a PR using your github tools
+4. Ensure `.github/workflows/` has a CI workflow that runs the backend test suite and a frontend lint/build; add one if it doesn't exist yet
+5. Submit a PR using your github tools
 
 ## AI design
 
@@ -46,6 +47,8 @@ scripts/start-windows.ps1
 scripts/stop-windows.ps1
 ```
 Backend available at http://localhost:8000
+
+Every PR must be covered by CI (GitHub Actions) running the backend test suite and a frontend lint/build. If no workflow exists, the current PR must add one before merge.
 
 ## Implementation phases
 
