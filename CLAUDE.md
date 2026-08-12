@@ -57,6 +57,6 @@ Tracks Jira epic progress. Update this list as tickets move.
 - [x] PL-2 — Legal document templates: curated 11 Common Paper templates + catalog.json (Done)
 - [x] PL-3 — Mutual NDA creator prototype: form-based UI, PDF download, no backend (Done)
 - [x] PL-4 — V1 technical foundation: backend, Docker, temporary DB, start/stop scripts, fake user gate (Done)
-- [ ] PL-5 — AI chat for Mutual NDA: replace the form with free-form AI chat (Cerebras/OpenRouter), still Mutual NDA only (PR open: [#6](https://github.com/HarryK62/prelegal/pull/6))
+- [x] PL-5 — AI chat for Mutual NDA: replace the form with free-form AI chat (Cerebras/OpenRouter), still Mutual NDA only (Done)
 - [ ] PL-6 — Expand AI chat to all 11 document types, with guidance when a user asks for an unsupported one
 - [ ] PL-7 — Multi-user support: real sign-up/sign-in, document history/persistence, UI polish, legal disclaimer
