@@ -17,7 +17,7 @@ if ($existing) {
 }
 
 Write-Host "Starting $ContainerName on http://localhost:8000 ..."
-docker run -d --name $ContainerName -p 8000:8000 $ImageName
+docker run -d --name $ContainerName --env-file .env -p 8000:8000 $ImageName
 if ($LASTEXITCODE -ne 0) { throw "docker run failed with exit code $LASTEXITCODE" }
 
 Write-Host "Prelegal is running at http://localhost:8000"

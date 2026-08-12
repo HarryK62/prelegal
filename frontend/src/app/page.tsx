@@ -2,6 +2,7 @@
 
 import { useState, useSyncExternalStore } from "react";
 import dynamic from "next/dynamic";
+import ChatPanel from "@/components/ChatPanel";
 import CoverPageForm from "@/components/CoverPageForm";
 import DocumentPreview from "@/components/DocumentPreview";
 import { defaultCoverPageValues } from "@/content/mutual-nda";
@@ -33,6 +34,7 @@ function getServerIsoDate() {
 
 export default function Home() {
   const [values, setValues] = useState(defaultCoverPageValues);
+  const [chatPending, setChatPending] = useState(false);
 
   // The server has no notion of "today" for a statically prerendered page, so
   // getServerSnapshot returns "" and the real date is only read on the client
@@ -46,13 +48,24 @@ export default function Home() {
       <header>
         <h1 className="text-2xl font-semibold text-zinc-900">Mutual NDA Creator</h1>
         <p className="mt-1 text-sm text-zinc-600">
-          Fill in the details below to generate a Common Paper Mutual Non-Disclosure Agreement.
+          Chat with the assistant about your deal and it will fill in a Common Paper Mutual
+          Non-Disclosure Agreement for you.
         </p>
       </header>
 
       <div className="grid flex-1 grid-cols-1 gap-6 lg:grid-cols-2">
-        <div className="space-y-6 rounded-lg border border-zinc-200 bg-white p-6">
-          <CoverPageForm values={displayValues} onChange={setValues} />
+        <div className="flex flex-col gap-6">
+          <ChatPanel fields={values} onFieldsChange={setValues} onPendingChange={setChatPending} />
+
+          <details className="rounded-lg border border-zinc-200 bg-white p-6">
+            <summary className="cursor-pointer text-sm font-medium text-zinc-900">
+              Review &amp; edit fields
+            </summary>
+            <fieldset disabled={chatPending} className="mt-6 disabled:opacity-60">
+              <CoverPageForm values={displayValues} onChange={setValues} />
+            </fieldset>
+          </details>
+
           <DownloadPdfButton values={displayValues} />
         </div>
 
