@@ -59,4 +59,4 @@ Tracks Jira epic progress. Update this list as tickets move.
 - [x] PL-4 — V1 technical foundation: backend, Docker, temporary DB, start/stop scripts, fake user gate (Done)
 - [x] PL-5 — AI chat for Mutual NDA: replace the form with free-form AI chat (Cerebras/OpenRouter), still Mutual NDA only (Done)
 - [x] PL-6 — Expand AI chat to all 11 document types, with guidance when a user asks for an unsupported one (Done)
-- [ ] PL-7 — Multi-user support: real sign-up/sign-in, document history/persistence, UI polish, legal disclaimer
+- [x] PL-7 — Multi-user support: real sign-up/sign-in, document history/persistence, UI polish, legal disclaimer (Done)
