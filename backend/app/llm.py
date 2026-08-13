@@ -1,56 +1,89 @@
+import json
 from datetime import date
 
 from litellm import completion
 
-from app.schemas import ChatRequest, ChatResponse, CoverPageFields
+from app.documents import DocumentDefinition, load_document_registry
+from app.schemas import ChatRequest, ChatResponse, FieldValue
 
 MODEL = "openrouter/openai/gpt-oss-120b"
 EXTRA_BODY = {"provider": {"order": ["cerebras"]}}
 
-FIELD_GUIDE = """
-You are a friendly legal-intake assistant helping a user fill in the Cover Page for a
-Common Paper Mutual Non-Disclosure Agreement (Mutual NDA). Have a natural, free-form
-conversation with the user: ask about a couple of related fields at a time, explain
-briefly what a field means if the user seems unsure, and confirm your understanding
-when an answer is ambiguous. Do not ask about fields that already have a value unless
-the user brings it up or asks to change it.
+INSTRUCTIONS = """
+You are a friendly legal-intake assistant for a platform that drafts legal agreements
+from a fixed catalog of templates. Have a natural, free-form conversation with the
+user. Your job has two stages:
 
-The fields you are collecting, and what each means in the agreement:
-- purpose: The business reason the parties are sharing confidential information (e.g.
-  "evaluating a potential partnership").
-- effectiveDate: The date the MNDA starts. Always return this as an ISO date
-  (YYYY-MM-DD).
-- mndaTermType ("expires" or "continues") and mndaTermYears: Whether the MNDA itself
-  expires a number of years after the effective date, or continues until either party
-  terminates it.
-- confidentialityTermType ("years" or "perpetuity") and confidentialityTermYears: How
-  long the duty to protect confidential information survives after the MNDA ends —
-  either a number of years, or forever (perpetuity).
-- governingLaw: The US state whose law governs the agreement.
-- jurisdiction: The city/county and state where legal disputes must be filed.
-- partyOne / partyTwo: Each party's contact details: name (signer's printed name),
-  title (their role at their company), company (entity name), and noticeAddress
-  (an email or postal address for legal notices).
+1. Figure out which ONE of the available document types (listed below) the user
+   needs. If nothing they've described matches any available document, say so plainly
+   and suggest whichever available document type is the closest fit - don't pretend we
+   can draft something we don't have a template for. If the best-fitting document type
+   is marked "(supplements a separate base agreement)" below, you MUST explain that it
+   isn't a standalone agreement and ask whether the user wants you to also draft a
+   suitable base agreement, or already has one, BEFORE setting documentType to that
+   rider document - do this even if the user firmly insists they only want the rider,
+   or names it by its exact catalog name. Only set documentType to a rider document
+   once this dependency has been raised at least once and the user has responded to
+   it (e.g. confirming they have a base agreement already, or that they want to
+   proceed with just the rider anyway).
+2. Once the user has confirmed a document type, collect the value for each of its
+   fields (listed below, once chosen) through natural conversation, a couple at a time.
+   Explain briefly what a field means if the user seems unsure. Do not ask about fields
+   that already have a value unless the user brings it up or wants to change it.
 
-You will be given the fields already known so far as JSON, and the conversation so far.
-Always return the COMPLETE set of fields in your structured response: carry over every
-value you already know unchanged, and only update the ones the latest user message
-addressed. Never invent values the user hasn't given you — leave a field at its current
-value (including empty strings) until the user actually provides it.
+Return your response as structured JSON with:
+- reply: what to say to the user next
+- documentType: the id of the confirmed document type, or "" if not yet determined
+- fields: the FULL current set of field key/value pairs for the confirmed document
+  type (empty list if no document type is confirmed yet). Always carry forward values
+  you already know unchanged, and only update the ones the latest message addressed.
+  Never invent values the user hasn't given you.
+
+Today's date is {today}. Use this to resolve relative dates like "today" or "next
+Monday" - always write dates back as ISO (YYYY-MM-DD).
 """.strip()
 
 
-def build_system_prompt(fields: CoverPageFields) -> str:
-    known_fields = fields.model_dump_json(by_alias=True)
-    today = date.today().isoformat()
+def _describe_catalog(registry: dict[str, DocumentDefinition]) -> str:
+    lines = ["Available document types:"]
+    for doc in registry.values():
+        suffix = " (supplements a separate base agreement)" if doc.requires_base_agreement else ""
+        lines.append(f"- {doc.id}: {doc.name}{suffix} - {doc.description}")
+    return "\n".join(lines)
+
+
+def _describe_active_document(doc: DocumentDefinition, known_fields: str) -> str:
+    field_list = "\n".join(f"- {f.key}: {f.label}" for f in doc.fields)
     return (
-        f"{FIELD_GUIDE}\n\nToday's date is {today}. Use this to resolve relative dates "
-        f'like "today" or "next Monday".\n\nFields known so far (JSON):\n{known_fields}'
+        f"\nThe user has confirmed they want: {doc.name} (documentType: {doc.id}).\n"
+        f"Its fields are:\n{field_list}\n\nFields known so far (JSON):\n{known_fields}"
     )
 
 
+def _fields_for_document(fields: list[FieldValue], doc: DocumentDefinition) -> list[FieldValue]:
+    """Drops any field whose key doesn't belong to this document - guards against
+    stale keys surviving a document-type switch mid-conversation, since the wire
+    schema is a generic key/value list with no per-document shape to enforce this."""
+    valid_keys = {f.key for f in doc.fields}
+    return [f for f in fields if f.key in valid_keys]
+
+
+def build_system_prompt(request: ChatRequest, registry: dict[str, DocumentDefinition]) -> str:
+    today = date.today().isoformat()
+    prompt = f"{INSTRUCTIONS.format(today=today)}\n\n{_describe_catalog(registry)}"
+
+    active_doc = registry.get(request.document_type)
+    if active_doc is not None:
+        known_fields = _fields_for_document(request.fields, active_doc)
+        known_fields_json = json.dumps([{"key": f.key, "value": f.value} for f in known_fields])
+        prompt += _describe_active_document(active_doc, known_fields_json)
+
+    return prompt
+
+
 def get_chat_response(request: ChatRequest) -> ChatResponse:
-    messages = [{"role": "system", "content": build_system_prompt(request.fields)}]
+    registry = load_document_registry()
+    messages = [{"role": "system", "content": build_system_prompt(request, registry)}]
     messages.extend({"role": turn.role, "content": turn.content} for turn in request.messages)
 
     response = completion(
@@ -60,5 +93,8 @@ def get_chat_response(request: ChatRequest) -> ChatResponse:
         reasoning_effort="low",
         extra_body=EXTRA_BODY,
     )
-    result = response.choices[0].message.content
-    return ChatResponse.model_validate_json(result)
+    result = ChatResponse.model_validate_json(response.choices[0].message.content)
+
+    active_doc = registry.get(result.document_type)
+    result.fields = _fields_for_document(result.fields, active_doc) if active_doc is not None else []
+    return result

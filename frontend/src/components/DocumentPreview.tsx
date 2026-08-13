@@ -1,14 +1,6 @@
-import {
-  type CoverPageValues,
-  formatConfidentialityTerm,
-  formatDate,
-  formatMndaTerm,
-  resolveFieldValue,
-  standardTermsClauses,
-  tokenizeClause,
-} from "@/content/mutual-nda";
+import { resolveFieldValue, tokenizeClause, type DocumentDefinition, type FieldMap } from "@/content/documents";
 
-function ClauseText({ body, values }: { body: string; values: CoverPageValues }) {
+function ClauseText({ body, fields, document }: { body: string; fields: FieldMap; document: DocumentDefinition }) {
   const tokens = tokenizeClause(body);
   return (
     <>
@@ -17,7 +9,7 @@ function ClauseText({ body, values }: { body: string; values: CoverPageValues })
         if (token.type === "bold") return <strong key={i}>{token.value}</strong>;
         return (
           <span key={i} className="underline decoration-dotted decoration-zinc-400">
-            {resolveFieldValue(token.key, values)}
+            {resolveFieldValue(token.key, fields, document)}
           </span>
         );
       })}
@@ -25,73 +17,35 @@ function ClauseText({ body, values }: { body: string; values: CoverPageValues })
   );
 }
 
-export default function DocumentPreview({ values }: { values: CoverPageValues }) {
+export default function DocumentPreview({
+  document,
+  fields,
+}: {
+  document: DocumentDefinition;
+  fields: FieldMap;
+}) {
   return (
     <article className="prose prose-zinc max-w-none rounded-lg border border-zinc-200 bg-white p-8 text-sm leading-relaxed text-zinc-900">
-      <h1 className="text-xl font-semibold">Mutual Non-Disclosure Agreement</h1>
+      <h1 className="text-xl font-semibold">{document.name}</h1>
 
       <section className="space-y-4">
-        <h2 className="text-base font-semibold">Cover Page</h2>
-
-        <div>
-          <div className="text-xs font-medium uppercase text-zinc-600">Purpose</div>
-          <p>{values.purpose || "[Purpose not yet specified]"}</p>
-        </div>
-
-        <div>
-          <div className="text-xs font-medium uppercase text-zinc-600">Effective Date</div>
-          <p>{formatDate(values.effectiveDate)}</p>
-        </div>
-
-        <div>
-          <div className="text-xs font-medium uppercase text-zinc-600">MNDA Term</div>
-          <p>{formatMndaTerm(values)}</p>
-        </div>
-
-        <div>
-          <div className="text-xs font-medium uppercase text-zinc-600">Term of Confidentiality</div>
-          <p>{formatConfidentialityTerm(values)}</p>
-        </div>
-
-        <div>
-          <div className="text-xs font-medium uppercase text-zinc-600">Governing Law &amp; Jurisdiction</div>
-          <p>
-            Governing Law: {values.governingLaw || "[Fill in state]"}
-            <br />
-            Jurisdiction: {values.jurisdiction || "[Fill in city or county and state]"}
-          </p>
-        </div>
-
-        <table className="w-full border-collapse text-left text-xs">
-          <thead>
-            <tr>
-              <th className="border border-zinc-200 p-2"></th>
-              <th className="border border-zinc-200 p-2">Party 1</th>
-              <th className="border border-zinc-200 p-2">Party 2</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(["name", "title", "company", "noticeAddress"] as const).map((field) => (
-              <tr key={field}>
-                <th className="border border-zinc-200 p-2 font-medium capitalize">
-                  {field === "noticeAddress" ? "Notice Address" : field}
-                </th>
-                <td className="border border-zinc-200 p-2">{values.partyOne[field] || "—"}</td>
-                <td className="border border-zinc-200 p-2">{values.partyTwo[field] || "—"}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <h2 className="text-base font-semibold">Fields</h2>
+        {document.fields.map((field) => (
+          <div key={field.key}>
+            <div className="text-xs font-medium uppercase text-zinc-600">{field.label}</div>
+            <p>{fields[field.key] || `[${field.label} not yet specified]`}</p>
+          </div>
+        ))}
       </section>
 
       <section className="mt-8 space-y-4">
-        <h2 className="text-base font-semibold">Standard Terms</h2>
-        {standardTermsClauses.map((clause) => (
+        <h2 className="text-base font-semibold">Terms</h2>
+        {document.clauses.map((clause) => (
           <p key={clause.number}>
             <strong>
               {clause.number}. {clause.title}.
             </strong>{" "}
-            <ClauseText body={clause.body} values={values} />
+            <ClauseText body={clause.body} fields={fields} document={document} />
           </p>
         ))}
       </section>

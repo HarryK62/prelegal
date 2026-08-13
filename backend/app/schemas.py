@@ -8,24 +8,9 @@ class CamelModel(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
 
-class PartyDetails(CamelModel):
-    name: str = ""
-    title: str = ""
-    company: str = ""
-    notice_address: str = ""
-
-
-class CoverPageFields(CamelModel):
-    purpose: str = "Evaluating whether to enter into a business relationship with the other party."
-    effective_date: str = ""
-    mnda_term_type: Literal["expires", "continues"] = "expires"
-    mnda_term_years: int = 1
-    confidentiality_term_type: Literal["years", "perpetuity"] = "years"
-    confidentiality_term_years: int = 1
-    governing_law: str = ""
-    jurisdiction: str = ""
-    party_one: PartyDetails = Field(default_factory=PartyDetails)
-    party_two: PartyDetails = Field(default_factory=PartyDetails)
+class FieldValue(CamelModel):
+    key: str
+    value: str
 
 
 class ChatTurn(CamelModel):
@@ -35,9 +20,11 @@ class ChatTurn(CamelModel):
 
 class ChatRequest(CamelModel):
     messages: list[ChatTurn]
-    fields: CoverPageFields = Field(default_factory=CoverPageFields)
+    document_type: str = ""
+    fields: list[FieldValue] = Field(default_factory=list)
 
 
 class ChatResponse(CamelModel):
     reply: str
-    fields: CoverPageFields
+    document_type: str
+    fields: list[FieldValue]

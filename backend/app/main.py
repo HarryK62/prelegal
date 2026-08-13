@@ -7,6 +7,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.db import init_db
 from app.routers.chat import router as chat_router
+from app.routers.documents import router as documents_router
 
 load_dotenv()
 
@@ -28,6 +29,7 @@ def health() -> dict[str, str]:
 
 
 app.include_router(chat_router)
+app.include_router(documents_router)
 
 if STATIC_DIR.is_dir():
     app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")
