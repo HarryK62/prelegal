@@ -9,13 +9,19 @@ covers all document types instead of one hand-transcribed model per document.
 """
 
 import json
+import os
 import re
 from functools import lru_cache
 from pathlib import Path
 
 from app.schemas import CamelModel
 
-REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+# Locally this file lives at <repo>/backend/app/documents.py, three parents up from
+# the repo root where catalog.json/templates/ live. The Docker image flattens
+# backend/app to /app/app and doesn't preserve that structure, so PRELEGAL_DATA_ROOT
+# lets the container point this at wherever it copied those two assets instead.
+_DEFAULT_REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+REPO_ROOT = Path(os.environ.get("PRELEGAL_DATA_ROOT", _DEFAULT_REPO_ROOT))
 CATALOG_PATH = REPO_ROOT / "catalog.json"
 TEMPLATES_DIR = REPO_ROOT / "templates"
 
