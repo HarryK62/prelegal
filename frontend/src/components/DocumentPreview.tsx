@@ -1,4 +1,5 @@
 import { resolveFieldValue, tokenizeClause, type DocumentDefinition, type FieldMap } from "@/content/documents";
+import Card from "@/components/Card";
 
 function ClauseText({ body, fields, document }: { body: string; fields: FieldMap; document: DocumentDefinition }) {
   const tokens = tokenizeClause(body);
@@ -25,7 +26,7 @@ export default function DocumentPreview({
   fields: FieldMap;
 }) {
   return (
-    <article className="prose prose-zinc max-w-none rounded-lg border border-zinc-200 bg-white p-8 text-sm leading-relaxed text-zinc-900">
+    <Card as="article" className="prose prose-zinc max-w-none p-8 text-sm leading-relaxed text-zinc-900">
       <h1 className="text-xl font-semibold">{document.name}</h1>
 
       <section className="space-y-4">
@@ -49,6 +50,6 @@ export default function DocumentPreview({
           </p>
         ))}
       </section>
-    </article>
+    </Card>
   );
 }

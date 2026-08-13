@@ -8,9 +8,6 @@ from pathlib import Path
 from fastapi.testclient import TestClient
 
 from app.documents import load_document_registry
-from app.main import app
-
-client = TestClient(app)
 
 
 def test_registry_covers_all_catalog_entries_except_mutual_nda_coverpage():
@@ -104,7 +101,7 @@ def test_prelegal_data_root_env_var_overrides_default_repo_root(tmp_path):
     assert "'test'" in result.stdout
 
 
-def test_list_documents_endpoint_returns_all_documents():
+def test_list_documents_endpoint_returns_all_documents(client: TestClient):
     response = client.get("/api/documents")
 
     assert response.status_code == 200
