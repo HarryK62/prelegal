@@ -1,5 +1,11 @@
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
-import { resolveFieldValue, tokenizeClause, type DocumentDefinition, type FieldMap } from "@/content/documents";
+import {
+  DISCLAIMER_TEXT,
+  resolveFieldValue,
+  tokenizeClause,
+  type DocumentDefinition,
+  type FieldMap,
+} from "@/content/documents";
 
 const styles = StyleSheet.create({
   page: { padding: 48, fontSize: 10, lineHeight: 1.5, fontFamily: "Helvetica" },
@@ -10,6 +16,15 @@ const styles = StyleSheet.create({
   paragraph: { marginBottom: 8, textAlign: "justify" },
   bold: { fontFamily: "Helvetica-Bold" },
   merged: { textDecoration: "underline" },
+  disclaimer: {
+    marginTop: 24,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#ccc",
+    fontSize: 8,
+    fontStyle: "italic",
+    color: "#666",
+  },
 });
 
 function ClauseParagraph({
@@ -80,6 +95,8 @@ export default function DocumentPdf({
             document={document}
           />
         ))}
+
+        <Text style={styles.disclaimer}>{DISCLAIMER_TEXT}</Text>
       </Page>
     </Document>
   );

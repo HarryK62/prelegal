@@ -1,4 +1,10 @@
-import { resolveFieldValue, tokenizeClause, type DocumentDefinition, type FieldMap } from "@/content/documents";
+import {
+  DISCLAIMER_TEXT,
+  resolveFieldValue,
+  tokenizeClause,
+  type DocumentDefinition,
+  type FieldMap,
+} from "@/content/documents";
 import Card from "@/components/Card";
 
 function ClauseText({ body, fields, document }: { body: string; fields: FieldMap; document: DocumentDefinition }) {
@@ -50,6 +56,8 @@ export default function DocumentPreview({
           </p>
         ))}
       </section>
+
+      <p className="mt-8 border-t border-zinc-200 pt-4 text-xs italic text-zinc-500">{DISCLAIMER_TEXT}</p>
     </Card>
   );
 }

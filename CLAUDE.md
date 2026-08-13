@@ -60,4 +60,4 @@ Tracks Jira epic progress. Update this list as tickets move.
 - [x] PL-5 — AI chat for Mutual NDA: replace the form with free-form AI chat (Cerebras/OpenRouter), still Mutual NDA only (Done)
 - [x] PL-6 — Expand AI chat to all 11 document types, with guidance when a user asks for an unsupported one (Done)
 - [x] PL-7 — Multi-user support: real sign-up/sign-in, document history/persistence, UI polish, legal disclaimer (Done)
-- [ ] PL-8 — Add the legal disclaimer directly into the generated document content (preview and PDF), not just the app's website footer
+- [x] PL-8 — Add the legal disclaimer directly into the generated document content (preview and PDF), not just the app's website footer (Done)
