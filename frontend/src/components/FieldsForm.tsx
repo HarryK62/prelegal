@@ -10,7 +10,7 @@ interface FieldsFormProps {
 
 const labelClass = "block text-sm font-medium italic text-zinc-800";
 const inputClass =
-  "mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 text-sm text-zinc-900 shadow-sm focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500";
+  "mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 text-sm text-zinc-900 shadow-sm focus:border-teal-600 focus:outline-none focus:ring-1 focus:ring-teal-600";
 
 export default function FieldsForm({ document, fields, onChange }: FieldsFormProps) {
   const setField = (key: string, value: string) => onChange({ ...fields, [key]: value });

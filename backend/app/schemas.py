@@ -22,9 +22,44 @@ class ChatRequest(CamelModel):
     messages: list[ChatTurn]
     document_type: str = ""
     fields: list[FieldValue] = Field(default_factory=list)
+    document_id: int | None = None
+
+
+class LlmReply(CamelModel):
+    """What the LLM itself produces via structured outputs - document_id is a
+    server-side persistence concern the model has no basis to reason about, so it's
+    added separately once the reply is used to build the actual API response."""
+
+    reply: str
+    document_type: str
+    fields: list[FieldValue]
 
 
 class ChatResponse(CamelModel):
     reply: str
     document_type: str
     fields: list[FieldValue]
+    document_id: int | None = None
+
+
+class SignUpRequest(CamelModel):
+    username: str
+    password: str
+
+
+class SignInRequest(CamelModel):
+    username: str
+    password: str
+
+
+class UserResponse(CamelModel):
+    id: int
+    username: str
+
+
+class SavedDocumentSummary(CamelModel):
+    id: int
+    document_type: str
+    fields: list[FieldValue]
+    created_at: str
+    updated_at: str

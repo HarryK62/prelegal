@@ -41,7 +41,7 @@ export default function DownloadPdfButton({
       type="button"
       onClick={handleDownload}
       disabled={generating}
-      className="w-full rounded-md bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-60"
+      className="w-full rounded-md bg-teal-700 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-60"
     >
       {generating ? "Generating PDF…" : "Download PDF"}
     </button>

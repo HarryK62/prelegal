@@ -4,7 +4,7 @@ from datetime import date
 from litellm import completion
 
 from app.documents import DocumentDefinition, load_document_registry
-from app.schemas import ChatRequest, ChatResponse, FieldValue
+from app.schemas import ChatRequest, FieldValue, LlmReply
 
 MODEL = "openrouter/openai/gpt-oss-120b"
 EXTRA_BODY = {"provider": {"order": ["cerebras"]}}
@@ -81,7 +81,7 @@ def build_system_prompt(request: ChatRequest, registry: dict[str, DocumentDefini
     return prompt
 
 
-def get_chat_response(request: ChatRequest) -> ChatResponse:
+def get_chat_response(request: ChatRequest) -> LlmReply:
     registry = load_document_registry()
     messages = [{"role": "system", "content": build_system_prompt(request, registry)}]
     messages.extend({"role": turn.role, "content": turn.content} for turn in request.messages)
@@ -89,11 +89,11 @@ def get_chat_response(request: ChatRequest) -> ChatResponse:
     response = completion(
         model=MODEL,
         messages=messages,
-        response_format=ChatResponse,
+        response_format=LlmReply,
         reasoning_effort="low",
         extra_body=EXTRA_BODY,
     )
-    result = ChatResponse.model_validate_json(response.choices[0].message.content)
+    result = LlmReply.model_validate_json(response.choices[0].message.content)
 
     active_doc = registry.get(result.document_type)
     result.fields = _fields_for_document(result.fields, active_doc) if active_doc is not None else []
