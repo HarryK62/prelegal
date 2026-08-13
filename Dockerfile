@@ -16,7 +16,10 @@ RUN uv sync --frozen --no-dev
 
 COPY backend/app ./app
 COPY --from=frontend-build /app/frontend/out ./static
+COPY catalog.json ./catalog.json
+COPY templates ./templates
 
 ENV PATH="/app/.venv/bin:$PATH"
+ENV PRELEGAL_DATA_ROOT="/app"
 EXPOSE 8000
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

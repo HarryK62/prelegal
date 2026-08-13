@@ -1,4 +1,9 @@
+import json
+import os
 import re
+import subprocess
+import sys
+from pathlib import Path
 
 from fastapi.testclient import TestClient
 
@@ -66,6 +71,37 @@ def test_mutual_nda_does_not_leak_the_trailing_attribution_footer():
     mutual_nda_text = " ".join(c.body for c in registry["mutual-nda"].clauses)
     assert "free to use under" not in mutual_nda_text
     assert "creativecommons.org" not in mutual_nda_text
+
+
+def test_prelegal_data_root_env_var_overrides_default_repo_root(tmp_path):
+    # This is what actually breaks Docker: documents.py locates catalog.json/templates/
+    # via a fixed number of parent-directory climbs from __file__, which is only valid
+    # for the local backend/app/documents.py layout. The Docker image copies app/ to a
+    # shallower path and never had catalog.json/templates in the build context at all,
+    # so PRELEGAL_DATA_ROOT lets the container point this module elsewhere. Runs in a
+    # subprocess for a genuinely fresh import - module-level constants can't be
+    # re-pointed by reassigning os.environ after the fact.
+    (tmp_path / "templates").mkdir()
+    (tmp_path / "catalog.json").write_text(
+        json.dumps({"templates": [{"name": "Test Doc", "description": "A test.", "filename": "test.md"}]}),
+        encoding="utf-8",
+    )
+    (tmp_path / "templates" / "test.md").write_text(
+        '# Test\n\n1. <span class="header_2">Intro</span>\n'
+        '    1. This mentions <span class="coverpage_link">Provider</span>.\n',
+        encoding="utf-8",
+    )
+
+    result = subprocess.run(
+        [sys.executable, "-c", "from app.documents import load_document_registry; print(sorted(load_document_registry()))"],
+        cwd=Path(__file__).resolve().parent.parent,
+        env={**os.environ, "PRELEGAL_DATA_ROOT": str(tmp_path)},
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert "'test'" in result.stdout
 
 
 def test_list_documents_endpoint_returns_all_documents():
