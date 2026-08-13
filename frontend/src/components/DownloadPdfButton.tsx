@@ -2,30 +2,32 @@
 
 import { useState } from "react";
 import { pdf } from "@react-pdf/renderer";
-import type { CoverPageValues } from "@/content/mutual-nda";
-import MutualNdaPdfDocument from "@/components/MutualNdaPdfDocument";
+import type { DocumentDefinition, FieldMap } from "@/content/documents";
+import DocumentPdf from "@/components/DocumentPdf";
 
-function buildFilename(values: CoverPageValues): string {
-  const parties = [values.partyOne.company, values.partyTwo.company]
-    .map((name) => name.trim())
-    .filter(Boolean)
-    .join("-and-")
-    .replace(/[^a-zA-Z0-9-]+/g, "");
-  return `Mutual-NDA${parties ? `-${parties}` : ""}.pdf`;
+function buildFilename(document: DocumentDefinition): string {
+  const slug = document.name.replace(/[^a-zA-Z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  return `${slug}.pdf`;
 }
 
-export default function DownloadPdfButton({ values }: { values: CoverPageValues }) {
+export default function DownloadPdfButton({
+  document,
+  fields,
+}: {
+  document: DocumentDefinition;
+  fields: FieldMap;
+}) {
   const [generating, setGenerating] = useState(false);
 
   const handleDownload = async () => {
     setGenerating(true);
     try {
-      const blob = await pdf(<MutualNdaPdfDocument values={values} />).toBlob();
+      const blob = await pdf(<DocumentPdf document={document} fields={fields} />).toBlob();
       const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
+      const link = window.document.createElement("a");
       link.href = url;
-      link.download = buildFilename(values);
-      document.body.appendChild(link);
+      link.download = buildFilename(document);
+      window.document.body.appendChild(link);
       link.click();
       link.remove();
       URL.revokeObjectURL(url);

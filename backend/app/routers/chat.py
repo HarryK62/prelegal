@@ -8,8 +8,8 @@ from app.schemas import ChatRequest, ChatResponse
 router = APIRouter(prefix="/api/chat", tags=["chat"])
 
 
-@router.post("/mutual-nda", response_model=ChatResponse)
-def chat_mutual_nda(request: ChatRequest) -> ChatResponse:
+@router.post("", response_model=ChatResponse)
+def chat(request: ChatRequest) -> ChatResponse:
     try:
         return get_chat_response(request)
     except OpenAIAPIError as exc:

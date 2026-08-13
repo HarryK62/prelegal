@@ -1,46 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import type { CoverPageValues } from "@/content/mutual-nda";
-
-interface ChatMessage {
-  role: "user" | "assistant";
-  content: string;
-}
+import type { FieldMap } from "@/content/documents";
+import { postChat, type ChatMessage } from "@/lib/api";
 
 const INITIAL_MESSAGE: ChatMessage = {
   role: "assistant",
-  content:
-    "Hi! I'll help you fill in the Mutual NDA cover page. Tell me a bit about the deal — who are the two parties, and why are you sharing confidential information?",
+  content: "Hi! Tell me what kind of legal agreement you need and I'll help you put it together.",
 };
-
-interface ChatPanelProps {
-  fields: CoverPageValues;
-  onFieldsChange: (fields: CoverPageValues) => void;
-  onPendingChange?: (pending: boolean) => void;
-}
 
 const FALLBACK_ERROR_MESSAGE = "Something went wrong. Please try again.";
 
-function extractErrorMessage(body: unknown): string | null {
-  if (!body || typeof body !== "object" || !("detail" in body)) return null;
-  const { detail } = body as { detail: unknown };
-
-  if (typeof detail === "string") return detail;
-
-  if (Array.isArray(detail)) {
-    const messages = detail
-      .map((item) =>
-        item && typeof item === "object" && "msg" in item ? String((item as { msg: unknown }).msg) : null,
-      )
-      .filter((msg): msg is string => Boolean(msg));
-    if (messages.length > 0) return messages.join(" ");
-  }
-
-  return null;
+interface ChatPanelProps {
+  documentType: string;
+  fields: FieldMap;
+  onResult: (documentType: string, fields: FieldMap) => void;
+  onPendingChange?: (pending: boolean) => void;
 }
 
-export default function ChatPanel({ fields, onFieldsChange, onPendingChange }: ChatPanelProps) {
+export default function ChatPanel({ documentType, fields, onResult, onPendingChange }: ChatPanelProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([INITIAL_MESSAGE]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
@@ -58,20 +36,9 @@ export default function ChatPanel({ fields, onFieldsChange, onPendingChange }: C
     setError(null);
 
     try {
-      const response = await fetch("/api/chat/mutual-nda", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: nextMessages, fields }),
-      });
-
-      if (!response.ok) {
-        const body = await response.json().catch(() => null);
-        throw new Error(extractErrorMessage(body) ?? FALLBACK_ERROR_MESSAGE);
-      }
-
-      const data: { reply: string; fields: CoverPageValues } = await response.json();
-      setMessages([...nextMessages, { role: "assistant", content: data.reply }]);
-      onFieldsChange(data.fields);
+      const result = await postChat(nextMessages, documentType, fields);
+      setMessages([...nextMessages, { role: "assistant", content: result.reply }]);
+      onResult(result.documentType, result.fields);
     } catch (err) {
       setError(err instanceof Error ? err.message : FALLBACK_ERROR_MESSAGE);
     } finally {
